@@ -18,8 +18,8 @@ namespace mistral
 			);
 		private:
 			std::shared_ptr<boost::asio::io_service>      io_service_ptr;
-			boost::asio::ip::tcp::socket                  socket;
 			boost::asio::ip::tcp::acceptor                acceptor;
+			boost::asio::ip::tcp::socket                  socket;
 			std::string                                   ip;
 			std::uint16_t                                 port;
 
