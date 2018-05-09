@@ -15,17 +15,17 @@ void mistral::http::response::msg_body(std::string msg)
 	_msg_body = msg;
 }
 
-std::uint16_t mistral::http::response::status_code()
+const std::uint16_t & mistral::http::response::status_code() const
 {
 	return _status_code;
 }
 
-std::string mistral::http::response::phrase()
+const std::string & mistral::http::response::phrase() const
 {
 	return _phrase;
 }
 
-std::string mistral::http::response::msg_body()
+const std::string & mistral::http::response::msg_body() const
 {
 	return _msg_body;
 }
@@ -38,12 +38,12 @@ void mistral::http::response::error_msg_body()
 		.append(_phrase);
 }
 
-mistral::http::response& mistral::http::response_build::get_response()
+mistral::http::response& mistral::http::response_v1_extra::get_response()
 {
 	return _response;
 }
 
-std::string mistral::http::response_build::complete_msg()
+void mistral::http::response_v1_extra::complete_msg()
 {
 	std::string result;
 	result.append("HTTP/1.1 ")
@@ -57,5 +57,6 @@ std::string mistral::http::response_build::complete_msg()
 	result.append("Content-Length: ").append(std::to_string(_response.msg_body().length())).append("\r\n");
 	result.append("\r\n");
 	result.append(_response.msg_body());
-	return result;
+
+	_response.msg_body(result);
 }

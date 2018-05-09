@@ -1,5 +1,5 @@
-#ifndef _MISTRAL_REQUEST_HPP_INCLUDED_
-#define _MISTRAL_REQUEST_HPP_INCLUDED_
+#ifndef _MISTRAL_REQUEST_H_INCLUDED_
+#define _MISTRAL_REQUEST_H_INCLUDED_
 
 namespace mistral
 {
@@ -19,6 +19,8 @@ namespace mistral
 			void                                       request_uri(std::string &uri);
 			void                                       request_version(std::string &version);
 
+			http_msg_buffer                          & buffer();
+
 			const std::string                        & raw_msg() const;
 			const std::string                        & request_method() const;
 			const std::string                        & request_uri() const;
@@ -35,6 +37,8 @@ namespace mistral
 			std::size_t                                body_end_index();
 
 		private:
+			http_msg_buffer                            _buffer;
+
 			std::size_t                                _first_line_end_index = 0;
 			std::size_t                                _header_end_index = 0;
 			std::size_t                                _body_end_index = 0;
@@ -50,7 +54,7 @@ namespace mistral
 		};
 
 		
-		class request_parser
+		class request_v1_extra
 		{
 		public:
 			void                       append_msg(const http_msg_buffer &_http_msg_buffer, const std::size_t &_length);
@@ -58,7 +62,7 @@ namespace mistral
 			bool                       first_line_end();
 			bool                       msg_end();
 
-			const request&             get_request() const;
+			request&                   get_request();
 
 		private:
 			request                    _request;

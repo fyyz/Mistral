@@ -1,5 +1,5 @@
-#ifndef _MISTRAL_RESPONSE_HPP_INCLUDED_
-#define _MISTRAL_RESPONSE_HPP_INCLUDED_
+#ifndef _MISTRAL_RESPONSE_H_INCLUDED_
+#define _MISTRAL_RESPONSE_H_INCLUDED_
 
 namespace mistral
 {
@@ -12,9 +12,9 @@ namespace mistral
 			void          phrase(std::string phrase);
 			void          msg_body(std::string msg_body);
 
-			std::uint16_t status_code();
-			std::string   phrase();
-			std::string   msg_body();
+			const std::uint16_t & status_code() const;
+			const std::string   & phrase() const;
+			const std::string   & msg_body() const;
 
 			void          error_msg_body();
 		private:
@@ -24,11 +24,11 @@ namespace mistral
 		};
 
 		
-		class response_build
+		class response_v1_extra
 		{
 		public:
-			response_build() = default;
-			std::string  complete_msg();
+			response_v1_extra() = default;
+			void         complete_msg();
 			response&    get_response();
 		private:
 			response     _response;

@@ -1,6 +1,6 @@
 #include "mistral_header.h"
 
-mistral::http::session::session
+mistral::http::session_v1::session_v1
 (
 	std::shared_ptr<boost::asio::io_service>      io_service_ptr,
 	boost::asio::ip::tcp::socket                  socket
@@ -10,16 +10,16 @@ mistral::http::session::session
 {
 }
 
-void mistral::http::session::start()
+void mistral::http::session_v1::start()
 {
 	do_read();
 }
 
-void mistral::http::session::do_read()
+void mistral::http::session_v1::do_read()
 {
 	auto self(shared_from_this());
 	_socket.async_read_some(
-		boost::asio::buffer(_http_msg_buffer),
+		boost::asio::buffer(_request_v1_extra.get_request().buffer()),
 		[this, self](boost::system::error_code ec, std::size_t length)
 		{
 			if (ec)
@@ -27,14 +27,14 @@ void mistral::http::session::do_read()
 				return;
 			}
 
-			_request_parser.append_msg(_http_msg_buffer, length);
+			_request_v1_extra.append_msg(_request_v1_extra.get_request().buffer(), length);
 
-			if (!_request_parser.do_parse())
+			if (!_request_v1_extra.do_parse())
 			{
 				return;
 			}
 
-			if (!_request_parser.msg_end())
+			if (!_request_v1_extra.msg_end())
 			{
 				do_read();
 			}
@@ -46,14 +46,18 @@ void mistral::http::session::do_read()
 	);
 }
 
-void mistral::http::session::do_write()
+void mistral::http::session_v1::do_write()
 {
 	auto self(shared_from_this());
-	router::get_instance().run_handle(_request_parser.get_request(), _response_build.get_response());
-	_http_response_msg = _response_build.complete_msg();
+	router::get_instance().run_handle(_request_v1_extra.get_request(), _response_v1_extra.get_response());
+	_response_v1_extra.complete_msg();
 	boost::asio::async_write(
 		_socket,
-		boost::asio::buffer(_http_response_msg, _http_response_msg.size()),
+		boost::asio::buffer
+		(
+			_response_v1_extra.get_response().msg_body(),
+			_response_v1_extra.get_response().msg_body().size()
+		),
 		[this, self](boost::system::error_code ec, std::size_t /*length*/)
 		{
 			if (ec)
@@ -64,10 +68,3 @@ void mistral::http::session::do_write()
 	);
 }
 
-void mistral::http::session::do_read_handle()
-{
-}
-
-void mistral::http::session::do_write_handle()
-{
-}

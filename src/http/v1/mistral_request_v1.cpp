@@ -30,6 +30,11 @@ void mistral::http::request::request_version(std::string &version)
 	_request_version = version;
 }
 
+mistral::http::http_msg_buffer & mistral::http::request::buffer()
+{
+	return _buffer;
+}
+
 const std::string & mistral::http::request::raw_msg() const
 {
 	return _raw_msg;
@@ -90,7 +95,7 @@ std::size_t mistral::http::request::body_end_index()
 	return _body_end_index;
 }
 
-bool mistral::http::request_parser::do_parse()
+bool mistral::http::request_v1_extra::do_parse()
 {
 	if (_request.first_line_end_index() == 0)
 	{
@@ -116,22 +121,22 @@ bool mistral::http::request_parser::do_parse()
 	return true;
 }
 
-bool mistral::http::request_parser::first_line_end()
+bool mistral::http::request_v1_extra::first_line_end()
 {
 	return _request.first_line_end_index() != 0;
 }
 
-bool mistral::http::request_parser::msg_end()
+bool mistral::http::request_v1_extra::msg_end()
 {
 	return _request.body_end_index() != 0;
 }
 
-const mistral::http::request& mistral::http::request_parser::get_request() const
+mistral::http::request& mistral::http::request_v1_extra::get_request()
 {
 	return _request;
 }
 
-void mistral::http::request_parser::append_msg(const mistral::http::http_msg_buffer &_http_msg_buffer, const std::size_t &_length)
+void mistral::http::request_v1_extra::append_msg(const mistral::http::http_msg_buffer &_http_msg_buffer, const std::size_t &_length)
 {
 	std::string msg;
 	for (std::size_t i = 0; i != _length; i++)
@@ -141,7 +146,7 @@ void mistral::http::request_parser::append_msg(const mistral::http::http_msg_buf
 	_request.append_raw_msg(msg);
 }
 
-bool mistral::http::request_parser::parser_first_line()
+bool mistral::http::request_v1_extra::parser_first_line()
 {
 	const std::size_t index = _request.raw_msg().find("\r\n");
 	if (index == _request.raw_msg().npos)
@@ -182,7 +187,7 @@ bool mistral::http::request_parser::parser_first_line()
 	return true;
 }
 
-bool mistral::http::request_parser::parser_header()
+bool mistral::http::request_v1_extra::parser_header()
 {
 	const std::size_t index = _request.raw_msg().find("\r\n\r\n");
 	if (index == _request.raw_msg().npos)
@@ -237,7 +242,7 @@ bool mistral::http::request_parser::parser_header()
 	return true;
 }
 
-bool mistral::http::request_parser::parser_body()
+bool mistral::http::request_v1_extra::parser_body()
 {
 	if (_request.request_method() == "GET")
 	{

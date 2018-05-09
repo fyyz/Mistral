@@ -1,33 +1,38 @@
-#ifndef _MISTRAL_SESSION_HPP_INCLUDED_
-#define _MISTRAL_SESSION_HPP_INCLUDED_
+#ifndef _MISTRAL_SESSION_H_INCLUDED_
+#define _MISTRAL_SESSION_H_INCLUDED_
 
 namespace mistral
 {
 	namespace http
 	{
-		class session : public std::enable_shared_from_this<session>
+		class basic_session
 		{
 		public:
-			session() = delete;
-			session(const session&) = delete;
-			session(
+			virtual void start() = 0;
+		protected:
+			virtual void do_read()  = 0;
+			virtual void do_write() = 0;
+		};
+
+		class session_v1 : public basic_session, public std::enable_shared_from_this<session_v1>
+		{
+		public:
+			session_v1() = delete;
+			session_v1(const session_v1&) = delete;
+			session_v1(
 				std::shared_ptr<boost::asio::io_service>      io_service_ptr,
 				boost::asio::ip::tcp::socket                  socket
 			);
-			void start();
-
+			virtual void start();
 		private:
-			std::shared_ptr<boost::asio::io_service>      io_service_ptr;
-			http_msg_buffer                               _http_msg_buffer;
-			std::string                                   _http_response_msg;
-			boost::asio::ip::tcp::socket                  _socket;
-			request_parser                                _request_parser;
-			response_build                                _response_build;
+			std::shared_ptr<boost::asio::io_service> io_service_ptr;
+			boost::asio::ip::tcp::socket             _socket;
 
-			void do_read();
-			void do_write();
-			void do_read_handle();
-			void do_write_handle();
+			request_v1_extra                         _request_v1_extra;
+			response_v1_extra                        _response_v1_extra;
+
+			virtual void do_read();
+			virtual void do_write();
 		};
 	}
 }
